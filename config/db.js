@@ -3,7 +3,7 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = process.env.MONGODB_URI;
 
 if (!uri) {
-    console.error("MONGODB_URI is missing from cPanel variables");
+    console.error("❌ MONGODB_URI is missing from cPanel Environment Variables");
 }
 
 const client = new MongoClient(uri || "", {
@@ -16,6 +16,7 @@ const client = new MongoClient(uri || "", {
     connectTimeoutMS: 5000
 });
 
+
 const db = client.db();
 
 const collections = {
@@ -25,7 +26,5 @@ const collections = {
     notices: db.collection("notices"),
     mentors: db.collection("mentors"),
 };
-
-client.connect().catch(err => console.error("DB Connection Error:", err));
 
 module.exports = { client, collections };
