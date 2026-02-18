@@ -1,34 +1,29 @@
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
-// Ensure variables are loaded if we are not on the cPanel server
-if (!process.env.MONGODB_URI) {
-    require('dotenv').config();
-}
+// Internal helper to get connection variables
+const getUri = () => {
+    if (!process.env.MONGODB_URI) {
+        require('dotenv').config();
+    }
+    return process.env.MONGODB_URI;
+};
 
-const uri = process.env.MONGODB_URI;
-
-if (!uri) {
-    console.error("❌ MONGODB_URI is not defined. Check your .env file or cPanel variables.");
-}
-
-const client = new MongoClient(uri || "", {
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true
-    },
+const client = new MongoClient(getUri() || "", {
+    serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true },
     serverSelectionTimeoutMS: 5000,
     connectTimeoutMS: 5000
 });
 
-const db = client.db();
+// We do NOT call client.db() at the top level. 
+// We export a function that controllers will call.
+const getDB = () => client.db();
 
 const collections = {
-    users: db.collection("users"),
-    certificates: db.collection("certificates"),
-    reviews: db.collection("reviews"),
-    notices: db.collection("notices"),
-    mentors: db.collection("mentors"),
+    get users() { return getDB().collection("users") },
+    get certificates() { return getDB().collection("certificates") },
+    get reviews() { return getDB().collection("reviews") },
+    get notices() { return getDB().collection("notices") },
+    get mentors() { return getDB().collection("mentors") },
 };
 
 module.exports = { client, collections };
