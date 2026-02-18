@@ -1,36 +1,25 @@
 const express = require('express');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
-const apiRoutes = require('./routes/apiRoutes');
-
 const app = express();
-const port = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors({
-    origin: ['http://localhost:5173', 'https://fciictclub2026.web.app', 'https://fciictclub2026.firebaseapp.com'],
-    credentials: true
-}));
-app.use(express.json());
-app.set('trust proxy', 1);
-
-// Routes
-app.get('/', (req, res) => res.send('🚀 FCI ICT Club Server is flying high!'));
-
-app.post('/api/jwt', (req, res) => {
-    const token = jwt.sign(req.body, process.env.ACCESS_TOKEN_SECRET || 'secret', { expiresIn: '1h' });
-    res.send({ token });
+// 1. Tell Passenger we are alive IMMEDIATELY
+app.get('/', (req, res) => {
+    res.status(200).send('🚀 SERVER IS LIVE - DATABASE DEFERRED');
 });
 
-app.post('/api/logout', (req, res) => res.send({ success: true }));
+app.use(cors());
+app.use(express.json());
 
-app.use(apiRoutes);
-
-// Export for cPanel/Passenger
+// 2. Export the app right now
 module.exports = app;
 
-// Local Development Only
+// 3. ONLY load the complicated stuff after the export
+const apiRoutes = require('./routes/apiRoutes');
+app.use(apiRoutes);
+
+// 4. Local listener
 if (process.env.NODE_ENV !== 'production') {
+    const port = process.env.PORT || 5000;
     require('dotenv').config();
-    app.listen(port, () => console.log(`🚀 Local Server running on port ${port}`));
+    app.listen(port, () => console.log(`🚀 Local on ${port}`));
 }
