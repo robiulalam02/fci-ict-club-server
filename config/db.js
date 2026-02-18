@@ -1,9 +1,14 @@
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
+// Ensure variables are loaded if we are not on the cPanel server
+if (!process.env.MONGODB_URI) {
+    require('dotenv').config();
+}
+
 const uri = process.env.MONGODB_URI;
 
 if (!uri) {
-    console.error("❌ MONGODB_URI is missing from cPanel Environment Variables");
+    console.error("❌ MONGODB_URI is not defined. Check your .env file or cPanel variables.");
 }
 
 const client = new MongoClient(uri || "", {
@@ -15,7 +20,6 @@ const client = new MongoClient(uri || "", {
     serverSelectionTimeoutMS: 5000,
     connectTimeoutMS: 5000
 });
-
 
 const db = client.db();
 
