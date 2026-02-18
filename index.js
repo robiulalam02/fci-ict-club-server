@@ -14,22 +14,23 @@ app.use(cors({
 app.use(express.json());
 app.set('trust proxy', 1);
 
-// Health Check (Should be at the top)
+// Routes
 app.get('/', (req, res) => res.send('🚀 FCI ICT Club Server is flying high!'));
 
-// Routes
 app.post('/api/jwt', (req, res) => {
     const token = jwt.sign(req.body, process.env.ACCESS_TOKEN_SECRET || 'secret', { expiresIn: '1h' });
     res.send({ token });
 });
+
 app.post('/api/logout', (req, res) => res.send({ success: true }));
+
 app.use(apiRoutes);
 
-// Export for cPanel Passenger
+// Export for cPanel/Passenger
 module.exports = app;
 
-// Listener for local development
+// Local Development Only
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
-    app.listen(port, () => console.log(`🚀 Local Server on port ${port}`));
+    app.listen(port, () => console.log(`🚀 Local Server running on port ${port}`));
 }
